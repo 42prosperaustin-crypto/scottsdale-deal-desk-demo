@@ -262,6 +262,34 @@
       margin-bottom: 12px;
     }
 
+    .route-tabs {
+      display: inline-flex;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--soft);
+      padding: 3px;
+      gap: 2px;
+      flex-wrap: wrap;
+    }
+
+    .route-tabs button {
+      min-height: 30px;
+      border: 0;
+      border-radius: 6px;
+      padding: 5px 9px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .route-tabs button.active {
+      background: white;
+      color: var(--ink);
+      box-shadow: 0 1px 3px rgba(32, 36, 40, 0.12);
+    }
+
     .toolbar select,
     .toolbar input {
       height: 34px;
@@ -653,7 +681,7 @@
       <header>
         <div>
           <h1 id="viewTitle">Today&apos;s Deal Shortlist</h1>
-          <div class="subhead" id="viewSubhead">Ranked by source quality, distress signal, spread, and next-action clarity.</div>
+          <div class="subhead" id="viewSubhead">Route every lead into flip, wholesale, watch, or pass.</div>
         </div>
         <div class="header-actions">
           <input class="search" id="search" placeholder="Search address, source, signal">
@@ -670,14 +698,21 @@
 
       <section class="content" id="shortlistView">
         <div class="metrics">
-          <div class="metric"><span>New leads</span><strong>31</strong><small>Last 7 days</small></div>
-          <div class="metric"><span>Qualified cards</span><strong>9</strong><small>Flip or wholesale route</small></div>
-          <div class="metric"><span>Actions queued</span><strong>3</strong><small>Offer or dispo check</small></div>
-          <div class="metric"><span>Bad leads skipped</span><strong>46</strong><small>Estimated this week</small></div>
+          <div class="metric"><span>New leads scanned</span><strong>31</strong><small>Last 7 days</small></div>
+          <div class="metric"><span>Flip candidates</span><strong>3</strong><small>Capital-worthy route</small></div>
+          <div class="metric"><span>Wholesale candidates</span><strong>2</strong><small>Fast dispo route</small></div>
+          <div class="metric"><span>Bad leads skipped</span><strong>46</strong><small>Auto rejected / deprioritized</small></div>
         </div>
         <div class="workspace">
           <section>
             <div class="toolbar">
+              <div class="route-tabs" aria-label="Route filter">
+                <button class="active" data-route-filter="all">All</button>
+                <button data-route-filter="flip">Flip</button>
+                <button data-route-filter="wholesale">Wholesale</button>
+                <button data-route-filter="watch">Watch</button>
+                <button data-route-filter="pass">Pass</button>
+              </div>
               <select id="sourceFilter" aria-label="Source filter">
                 <option value="all">All sources</option>
                 <option value="Agent">Agent</option>
@@ -764,7 +799,7 @@
       <section class="content hidden" id="metricsView">
         <div class="metrics">
           <div class="metric"><span>Lead to qualified</span><strong>29%</strong><small>Target: 20%+</small></div>
-          <div class="metric"><span>Qualified to action</span><strong>33%</strong><small>3 of 9 this week</small></div>
+          <div class="metric"><span>Flip / wholesale split</span><strong>60 / 40</strong><small>Qualified routes</small></div>
           <div class="metric"><span>Best source</span><strong>Agent</strong><small>Highest score average</small></div>
           <div class="metric"><span>Bad lead reason</span><strong>Thin spread</strong><small>Most common reject</small></div>
         </div>
@@ -786,6 +821,7 @@
         flipScore: 88,
         wholesaleScore: 63,
         route: "Flip",
+        routeKey: "flip",
         address: "Demo Property A, Arcadia Lite",
         source: "Agent",
         stage: "Call today",
@@ -805,6 +841,7 @@
         flipScore: 71,
         wholesaleScore: 84,
         route: "Wholesale",
+        routeKey: "wholesale",
         address: "Demo Property B, Paradise Valley",
         source: "Referral",
         stage: "Review comps",
@@ -824,6 +861,7 @@
         flipScore: 68,
         wholesaleScore: 57,
         route: "Watch",
+        routeKey: "watch",
         address: "Demo Property C, Arcadia Proper",
         source: "Public Signal",
         stage: "Watch",
@@ -843,6 +881,7 @@
         flipScore: 42,
         wholesaleScore: 58,
         route: "Pass / maybe dispo",
+        routeKey: "pass",
         address: "Demo Property D, Scottsdale",
         source: "Wholesaler",
         stage: "Pass risk",
@@ -862,6 +901,7 @@
         flipScore: 76,
         wholesaleScore: 66,
         route: "Flip if price moves",
+        routeKey: "flip",
         address: "Demo Property E, Paradise Valley Border",
         source: "Agent",
         stage: "Review comps",
@@ -878,6 +918,7 @@
 
     let selectedId = 1;
     let hotOnly = false;
+    let routeFilter = "all";
 
     const list = document.getElementById("dealList");
     const detail = document.getElementById("detail");
@@ -905,8 +946,9 @@
         const stageOk = stageFilter.value === "all" || deal.stage === stageFilter.value;
         const scoreOk = deal.score >= Number(minScore.value || 0);
         const hotOk = !hotOnly || deal.status === "hot";
+        const routeOk = routeFilter === "all" || deal.routeKey === routeFilter;
         const qOk = !q || [deal.address, deal.source, deal.stage, deal.signal, deal.badges.join(" ")].join(" ").toLowerCase().includes(q);
-        return sourceOk && stageOk && scoreOk && hotOk && qOk;
+        return sourceOk && stageOk && scoreOk && hotOk && routeOk && qOk;
       });
     }
 
@@ -995,6 +1037,15 @@
       hotOnly = !hotOnly;
       toggleHot.classList.toggle("primary", hotOnly);
       renderList();
+    });
+    document.querySelectorAll("[data-route-filter]").forEach((button) => {
+      button.addEventListener("click", () => {
+        routeFilter = button.dataset.routeFilter;
+        document.querySelectorAll("[data-route-filter]").forEach((node) => {
+          node.classList.toggle("active", node === button);
+        });
+        renderList();
+      });
     });
     document.querySelectorAll("[data-view], [data-view-jump]").forEach((button) => {
       button.addEventListener("click", () => switchView(button.dataset.view || button.dataset.viewJump));

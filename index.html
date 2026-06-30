@@ -485,6 +485,66 @@
       padding-left: 18px;
     }
 
+    .comp-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .comp-row {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #fbfcfd;
+      padding: 9px;
+      display: grid;
+      gap: 5px;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .comp-row:hover,
+    .comp-row.active {
+      border-color: #202428;
+      background: white;
+    }
+
+    .comp-row strong {
+      font-size: 13px;
+    }
+
+    .comp-row span {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .comp-detail {
+      margin-top: 10px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      padding: 10px;
+      background: #fbfcfd;
+    }
+
+    .comp-detail-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .comp-detail-grid div {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .comp-detail-grid strong {
+      display: block;
+      color: var(--ink);
+      font-size: 13px;
+      margin-top: 3px;
+    }
+
     .source-grid {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -853,6 +913,11 @@
         signal: "91 DOM, second price drop, outdated interior, listing agent mentioned seller wants certainty.",
         next: "Agent calls listing agent today and asks about inspection issues, timeline, and seller flexibility.",
         risks: ["Spread depends on true repair load", "Need roof/HVAC age", "Could be shopped to other investor buyers"],
+        comps: [
+          { id: "a1", address: "Arcadia Lite Renovated Ranch", price: "$735k", date: "Sold 42 days ago", distance: "0.4 mi", beds: "4", baths: "3", sqft: "2,060", year: "1958", condition: "Renovated", note: "Best ARV anchor: similar size, updated kitchen/baths, same buyer pool." },
+          { id: "a2", address: "Arcadia Lite Pool Home", price: "$710k", date: "Sold 64 days ago", distance: "0.7 mi", beds: "3", baths: "2", sqft: "1,910", year: "1962", condition: "Updated", note: "Good support comp, slightly smaller but strong finish level." },
+          { id: "a3", address: "South Scottsdale Original", price: "$585k", date: "Sold 28 days ago", distance: "0.9 mi", beds: "3", baths: "2", sqft: "1,840", year: "1960", condition: "Dated", note: "Useful as-is baseline; not an ARV comp." }
+        ],
         badges: ["Flip route", "Stale MLS", "Price drop", "Agent signal"]
       },
       {
@@ -873,6 +938,11 @@
         signal: "Contractor saw deferred maintenance during bid visit. Owner asked about selling as-is.",
         next: "Confirm owner permission, collect photos, estimate repair band, then make soft as-is range.",
         risks: ["Unclear seller intent", "May need licensed agent involvement", "No asking price yet"],
+        comps: [
+          { id: "b1", address: "PV Border Modernized", price: "$1.24M", date: "Sold 51 days ago", distance: "0.6 mi", beds: "4", baths: "3", sqft: "2,780", year: "1974", condition: "Renovated", note: "Strong end-buyer story if repair scope is controlled." },
+          { id: "b2", address: "PV Estate Original", price: "$910k", date: "Sold 73 days ago", distance: "0.8 mi", beds: "4", baths: "3", sqft: "2,640", year: "1971", condition: "Original", note: "As-is comp suggests wholesale route may be cleaner than full rehab." },
+          { id: "b3", address: "PV Investor Resale", price: "$1.18M", date: "Sold 96 days ago", distance: "1.1 mi", beds: "5", baths: "3", sqft: "2,930", year: "1978", condition: "Updated", note: "Larger than subject; discount in ARV confidence." }
+        ],
         badges: ["Wholesale route", "Contractor tip", "As-is", "Early signal"]
       },
       {
@@ -893,6 +963,11 @@
         signal: "Out-of-state owner, dated last permit history, nearby remodeled comps moving.",
         next: "Add to watchlist and alert on price drop, ownership change, or listing status change.",
         risks: ["No motivation confirmed", "Spread not strong enough yet"],
+        comps: [
+          { id: "c1", address: "Arcadia Proper Remodel", price: "$1.42M", date: "Sold 35 days ago", distance: "0.5 mi", beds: "4", baths: "3", sqft: "2,410", year: "1956", condition: "Renovated", note: "Premium comp; use only if subject can reach similar finish." },
+          { id: "c2", address: "Arcadia Dated Ranch", price: "$1.02M", date: "Sold 80 days ago", distance: "0.6 mi", beds: "3", baths: "2", sqft: "2,080", year: "1954", condition: "Dated", note: "Supports current watch status; seller motivation still missing." },
+          { id: "c3", address: "Arcadia Light Remodel", price: "$1.21M", date: "Sold 112 days ago", distance: "1.0 mi", beds: "4", baths: "2", sqft: "2,250", year: "1959", condition: "Partial update", note: "Middle comp for ARV range, older sale." }
+        ],
         badges: ["Watch", "Absentee owner", "Permit gap", "Watchlist"]
       },
       {
@@ -913,6 +988,11 @@
         signal: "Wholesaler claims deep discount, but comps are thin and assignment spread appears high.",
         next: "Pass unless seller access and price transparency improve.",
         risks: ["Thin spread", "Unverified repair scope", "Likely blasted to buyers list"],
+        comps: [
+          { id: "d1", address: "Scottsdale Flip Resale", price: "$548k", date: "Sold 39 days ago", distance: "0.5 mi", beds: "3", baths: "2", sqft: "1,680", year: "1971", condition: "Renovated", note: "Best-case ARV still leaves thin spread after assignment." },
+          { id: "d2", address: "Scottsdale As-Is Sale", price: "$405k", date: "Sold 58 days ago", distance: "0.7 mi", beds: "3", baths: "2", sqft: "1,590", year: "1969", condition: "Dated", note: "As-is comp is too close to asking price." },
+          { id: "d3", address: "Nearby Updated Patio Home", price: "$525k", date: "Sold 102 days ago", distance: "0.9 mi", beds: "3", baths: "2", sqft: "1,720", year: "1974", condition: "Updated", note: "Different product type; lower confidence." }
+        ],
         badges: ["Pass", "Wholesaler", "Thin spread"]
       },
       {
@@ -933,11 +1013,17 @@
         signal: "Strong location, poor photos, functional obsolescence, seller rejected two retail offers.",
         next: "Review layout constraints and ask if seller would consider clean cash close below list.",
         risks: ["Premium area may compress margin", "Unknown structural constraints"],
+        comps: [
+          { id: "e1", address: "PV Border Luxury Remodel", price: "$1.05M", date: "Sold 47 days ago", distance: "0.4 mi", beds: "4", baths: "3", sqft: "2,520", year: "1968", condition: "Renovated", note: "Good upside comp if layout can be opened up." },
+          { id: "e2", address: "PV Border Original", price: "$760k", date: "Sold 69 days ago", distance: "0.6 mi", beds: "3", baths: "2", sqft: "2,210", year: "1965", condition: "Original", note: "As-is support; current asking still needs movement." },
+          { id: "e3", address: "Scottsdale/PV Updated", price: "$995k", date: "Sold 88 days ago", distance: "0.8 mi", beds: "4", baths: "3", sqft: "2,390", year: "1970", condition: "Updated", note: "Strong resale comp, slightly superior finish." }
+        ],
         badges: ["Flip route", "Poor photos", "Rejected offers", "Agent signal"]
       }
     ];
 
     let selectedId = 1;
+    let selectedCompId = null;
     let hotOnly = false;
     let routeFilter = "all";
 
@@ -1001,6 +1087,7 @@
       document.querySelectorAll(".deal").forEach((node) => {
         node.addEventListener("click", () => {
           selectedId = Number(node.dataset.id);
+          selectedCompId = null;
           renderList();
           renderDetail();
         });
@@ -1014,6 +1101,7 @@
         detail.innerHTML = "";
         return;
       }
+      const selectedComp = (deal.comps || []).find((comp) => comp.id === selectedCompId) || (deal.comps || [])[0];
       detail.innerHTML = `
         <div class="detail-top">
           <h2>${deal.address}</h2>
@@ -1031,8 +1119,39 @@
         </div>
         <div class="section"><h3>Signal</h3><p>${deal.signal}</p></div>
         <div class="section"><h3>Next action</h3><p>${deal.next}</p></div>
+        <div class="section">
+          <h3>Comps</h3>
+          <div class="comp-list">
+            ${(deal.comps || []).map((comp) => `
+              <button class="comp-row ${selectedComp && selectedComp.id === comp.id ? "active" : ""}" data-comp-id="${comp.id}">
+                <strong>${comp.address}</strong>
+                <span>${comp.price} · ${comp.date} · ${comp.distance} · ${comp.sqft} sqft</span>
+              </button>
+            `).join("")}
+          </div>
+          ${selectedComp ? `
+            <div class="comp-detail">
+              <strong>${selectedComp.address}</strong>
+              <div class="comp-detail-grid">
+                <div>Sold price<strong>${selectedComp.price}</strong></div>
+                <div>Sold date<strong>${selectedComp.date}</strong></div>
+                <div>Distance<strong>${selectedComp.distance}</strong></div>
+                <div>Layout<strong>${selectedComp.beds} bd / ${selectedComp.baths} ba</strong></div>
+                <div>Size<strong>${selectedComp.sqft} sqft</strong></div>
+                <div>Year<strong>${selectedComp.year}</strong></div>
+              </div>
+              <p style="margin-top:10px;">${selectedComp.note}</p>
+            </div>
+          ` : `<p>No comps attached yet.</p>`}
+        </div>
         <div class="section"><h3>Risk checks</h3><ul>${deal.risks.map((risk) => `<li>${risk}</li>`).join("")}</ul></div>
       `;
+      detail.querySelectorAll("[data-comp-id]").forEach((button) => {
+        button.addEventListener("click", () => {
+          selectedCompId = button.dataset.compId;
+          renderDetail();
+        });
+      });
     }
 
     function switchView(view) {
@@ -1082,6 +1201,8 @@
       const wholesaleScore = isWholesaleLean ? 78 : source === "Referral" ? 74 : 67;
       const routeKey = wholesaleScore > flipScore + 5 ? "wholesale" : "flip";
       const route = routeKey === "wholesale" ? "Wholesale" : "Flip";
+      const address = String(data.get("address") || "New demo property");
+      const arv = String(data.get("arv") || "Needs comps");
       const newDeal = {
         id: Date.now(),
         status: routeKey === "wholesale" ? "hot" : "watch",
@@ -1090,16 +1211,20 @@
         wholesaleScore,
         route,
         routeKey,
-        address: String(data.get("address") || "New demo property"),
+        address,
         source,
         stage: "Review comps",
         price: String(data.get("price") || "Unknown"),
-        arv: String(data.get("arv") || "Needs comps"),
+        arv,
         repairs: repair,
         mao: "Needs comp set",
         signal: String(data.get("signal") || "Manually added pilot lead. Needs enrichment and comp review."),
         next: "Pull comps, enrich property record, then confirm whether this routes to flip, wholesale, watch, or pass.",
         risks: ["Fallback entry needs enrichment", "Scores are provisional until comps are attached", "Verify source and seller motivation"],
+        comps: [
+          { id: `new-${Date.now()}-1`, address: `${address} nearby sold comp`, price: arv === "Needs comps" ? "Needs API" : arv, date: "Recent sale", distance: "0.5 mi", beds: "TBD", baths: "TBD", sqft: "TBD", year: "TBD", condition: "Unknown", note: "Placeholder comp. A real version would populate this from RentCast, ATTOM, MLS export, or county sale records." },
+          { id: `new-${Date.now()}-2`, address: `${address} as-is baseline`, price: "Needs API", date: "Recent sale", distance: "0.8 mi", beds: "TBD", baths: "TBD", sqft: "TBD", year: "TBD", condition: "As-is", note: "Used to compare current condition value before estimating rehab spread." }
+        ],
         badges: [`${route} route`, "Fallback entry", "Needs comps"]
       };
       deals.unshift(newDeal);

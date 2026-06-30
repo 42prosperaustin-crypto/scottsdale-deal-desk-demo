@@ -346,6 +346,37 @@
       font-weight: 800;
     }
 
+    .score small {
+      display: block;
+      font-size: 10px;
+      font-weight: 700;
+      margin-top: 2px;
+      color: rgba(255, 255, 255, 0.72);
+      text-align: center;
+    }
+
+    .route-scores {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .mini-score {
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      padding: 6px 8px;
+      background: #fbfcfd;
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .mini-score strong {
+      color: var(--ink);
+      font-size: 13px;
+    }
+
     .detail {
       position: sticky;
       top: 94px;
@@ -640,8 +671,8 @@
       <section class="content" id="shortlistView">
         <div class="metrics">
           <div class="metric"><span>New leads</span><strong>31</strong><small>Last 7 days</small></div>
-          <div class="metric"><span>Qualified cards</span><strong>9</strong><small>Worth a closer look</small></div>
-          <div class="metric"><span>Offers queued</span><strong>3</strong><small>Needs owner/agent contact</small></div>
+          <div class="metric"><span>Qualified cards</span><strong>9</strong><small>Flip or wholesale route</small></div>
+          <div class="metric"><span>Actions queued</span><strong>3</strong><small>Offer or dispo check</small></div>
           <div class="metric"><span>Bad leads skipped</span><strong>46</strong><small>Estimated this week</small></div>
         </div>
         <div class="workspace">
@@ -733,7 +764,7 @@
       <section class="content hidden" id="metricsView">
         <div class="metrics">
           <div class="metric"><span>Lead to qualified</span><strong>29%</strong><small>Target: 20%+</small></div>
-          <div class="metric"><span>Qualified to offer</span><strong>33%</strong><small>3 of 9 this week</small></div>
+          <div class="metric"><span>Qualified to action</span><strong>33%</strong><small>3 of 9 this week</small></div>
           <div class="metric"><span>Best source</span><strong>Agent</strong><small>Highest score average</small></div>
           <div class="metric"><span>Bad lead reason</span><strong>Thin spread</strong><small>Most common reject</small></div>
         </div>
@@ -752,6 +783,9 @@
         id: 1,
         status: "hot",
         score: 88,
+        flipScore: 88,
+        wholesaleScore: 63,
+        route: "Flip",
         address: "Demo Property A, Arcadia Lite",
         source: "Agent",
         stage: "Call today",
@@ -762,12 +796,15 @@
         signal: "91 DOM, second price drop, outdated interior, listing agent mentioned seller wants certainty.",
         next: "Agent calls listing agent today and asks about inspection issues, timeline, and seller flexibility.",
         risks: ["Spread depends on true repair load", "Need roof/HVAC age", "Could be shopped to other investor buyers"],
-        badges: ["Stale MLS", "Price drop", "Agent signal"]
+        badges: ["Flip route", "Stale MLS", "Price drop", "Agent signal"]
       },
       {
         id: 2,
         status: "hot",
         score: 84,
+        flipScore: 71,
+        wholesaleScore: 84,
+        route: "Wholesale",
         address: "Demo Property B, Paradise Valley",
         source: "Referral",
         stage: "Review comps",
@@ -778,12 +815,15 @@
         signal: "Contractor saw deferred maintenance during bid visit. Owner asked about selling as-is.",
         next: "Confirm owner permission, collect photos, estimate repair band, then make soft as-is range.",
         risks: ["Unclear seller intent", "May need licensed agent involvement", "No asking price yet"],
-        badges: ["Contractor tip", "As-is", "Early signal"]
+        badges: ["Wholesale route", "Contractor tip", "As-is", "Early signal"]
       },
       {
         id: 3,
         status: "watch",
         score: 72,
+        flipScore: 68,
+        wholesaleScore: 57,
+        route: "Watch",
         address: "Demo Property C, Arcadia Proper",
         source: "Public Signal",
         stage: "Watch",
@@ -794,12 +834,15 @@
         signal: "Out-of-state owner, dated last permit history, nearby remodeled comps moving.",
         next: "Add to watchlist and alert on price drop, ownership change, or listing status change.",
         risks: ["No motivation confirmed", "Spread not strong enough yet"],
-        badges: ["Absentee owner", "Permit gap", "Watchlist"]
+        badges: ["Watch", "Absentee owner", "Permit gap", "Watchlist"]
       },
       {
         id: 4,
         status: "risk",
         score: 58,
+        flipScore: 42,
+        wholesaleScore: 58,
+        route: "Pass / maybe dispo",
         address: "Demo Property D, Scottsdale",
         source: "Wholesaler",
         stage: "Pass risk",
@@ -810,12 +853,15 @@
         signal: "Wholesaler claims deep discount, but comps are thin and assignment spread appears high.",
         next: "Pass unless seller access and price transparency improve.",
         risks: ["Thin spread", "Unverified repair scope", "Likely blasted to buyers list"],
-        badges: ["Wholesaler", "Thin spread", "Pass"]
+        badges: ["Pass", "Wholesaler", "Thin spread"]
       },
       {
         id: 5,
         status: "watch",
-        score: 69,
+        score: 76,
+        flipScore: 76,
+        wholesaleScore: 66,
+        route: "Flip if price moves",
         address: "Demo Property E, Paradise Valley Border",
         source: "Agent",
         stage: "Review comps",
@@ -826,7 +872,7 @@
         signal: "Strong location, poor photos, functional obsolescence, seller rejected two retail offers.",
         next: "Review layout constraints and ask if seller would consider clean cash close below list.",
         risks: ["Premium area may compress margin", "Unknown structural constraints"],
-        badges: ["Poor photos", "Rejected offers", "Agent signal"]
+        badges: ["Flip route", "Poor photos", "Rejected offers", "Agent signal"]
       }
     ];
 
@@ -844,6 +890,8 @@
     function badgeClass(text) {
       const lower = text.toLowerCase();
       if (lower.includes("pass") || lower.includes("thin")) return "red";
+      if (lower.includes("wholesale")) return "purple";
+      if (lower.includes("flip")) return "green";
       if (lower.includes("price") || lower.includes("watch")) return "amber";
       if (lower.includes("agent") || lower.includes("early")) return "green";
       if (lower.includes("contractor") || lower.includes("poor")) return "purple";
@@ -875,11 +923,16 @@
               <span>ARV ${deal.arv}</span>
               <span>MAO ${deal.mao}</span>
             </div>
+            <div class="route-scores">
+              <span class="mini-score">Route <strong>${deal.route}</strong></span>
+              <span class="mini-score">Flip <strong>${deal.flipScore}</strong></span>
+              <span class="mini-score">Wholesale <strong>${deal.wholesaleScore}</strong></span>
+            </div>
             <div class="badges">
               ${deal.badges.map((badge) => `<span class="badge ${badgeClass(badge)}">${badge}</span>`).join("")}
             </div>
           </div>
-          <div class="score">${deal.score}</div>
+          <div class="score">${deal.score}<small>best</small></div>
         </article>
       `).join("") || `<div class="source"><h2>No matching deals</h2><p>Adjust filters or add a new lead.</p></div>`;
       document.querySelectorAll(".deal").forEach((node) => {
@@ -904,8 +957,10 @@
           <div class="badges">${deal.badges.map((badge) => `<span class="badge ${badgeClass(badge)}">${badge}</span>`).join("")}</div>
         </div>
         <div class="detail-grid">
-          <div class="detail-stat"><span>Score</span><strong>${deal.score}/100</strong></div>
+          <div class="detail-stat"><span>Route</span><strong>${deal.route}</strong></div>
           <div class="detail-stat"><span>Source</span><strong>${deal.source}</strong></div>
+          <div class="detail-stat"><span>Flip score</span><strong>${deal.flipScore}/100</strong></div>
+          <div class="detail-stat"><span>Wholesale score</span><strong>${deal.wholesaleScore}/100</strong></div>
           <div class="detail-stat"><span>Price</span><strong>${deal.price}</strong></div>
           <div class="detail-stat"><span>ARV</span><strong>${deal.arv}</strong></div>
           <div class="detail-stat"><span>Repairs</span><strong>${deal.repairs}</strong></div>

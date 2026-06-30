@@ -1,0 +1,955 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PV / Arcadia Deal Desk Demo</title>
+  <style>
+    :root {
+      --bg: #f6f7f8;
+      --panel: #ffffff;
+      --ink: #202428;
+      --muted: #66707a;
+      --line: #d9dee3;
+      --soft: #eef1f4;
+      --green: #16794c;
+      --green-soft: #e5f4ec;
+      --amber: #986a13;
+      --amber-soft: #fff4da;
+      --red: #a33a32;
+      --red-soft: #fae9e7;
+      --blue: #276c9f;
+      --blue-soft: #e7f1fa;
+      --purple: #6f4aa8;
+      --purple-soft: #f0eafa;
+      --shadow: 0 12px 28px rgba(32, 36, 40, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      letter-spacing: 0;
+    }
+
+    button, input, select, textarea {
+      font: inherit;
+    }
+
+    .shell {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 248px minmax(0, 1fr);
+    }
+
+    .sidebar {
+      background: #202428;
+      color: white;
+      padding: 22px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .mark {
+      width: 34px;
+      height: 34px;
+      border-radius: 7px;
+      display: grid;
+      place-items: center;
+      background: #f2c14e;
+      color: #202428;
+      font-weight: 800;
+    }
+
+    .brand strong {
+      display: block;
+      font-size: 15px;
+      line-height: 1.15;
+    }
+
+    .brand span {
+      display: block;
+      color: #aeb8c2;
+      font-size: 12px;
+      margin-top: 2px;
+    }
+
+    .nav {
+      display: grid;
+      gap: 6px;
+    }
+
+    .nav button {
+      width: 100%;
+      min-height: 38px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #d8dee4;
+      background: transparent;
+      border: 0;
+      border-radius: 7px;
+      padding: 8px 10px;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .nav button.active,
+    .nav button:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+    }
+
+    .nav svg {
+      width: 17px;
+      height: 17px;
+      flex: 0 0 auto;
+    }
+
+    .market-note {
+      margin-top: auto;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 8px;
+      padding: 12px;
+      color: #d7dee6;
+      font-size: 12px;
+      line-height: 1.4;
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .main {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      min-height: 72px;
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.82);
+      backdrop-filter: blur(12px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 21px;
+      line-height: 1.2;
+    }
+
+    .subhead {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .search {
+      height: 38px;
+      min-width: 260px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      padding: 0 12px;
+      background: white;
+      color: var(--ink);
+    }
+
+    .button {
+      min-height: 38px;
+      border: 1px solid var(--line);
+      background: white;
+      color: var(--ink);
+      border-radius: 7px;
+      padding: 8px 12px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+
+    .button.primary {
+      background: #202428;
+      color: white;
+      border-color: #202428;
+    }
+
+    .button:hover {
+      transform: translateY(-1px);
+    }
+
+    .content {
+      padding: 22px 24px 28px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .metric {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      box-shadow: var(--shadow);
+      min-height: 92px;
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .metric strong {
+      display: block;
+      margin-top: 8px;
+      font-size: 24px;
+      line-height: 1;
+    }
+
+    .metric small {
+      display: block;
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 380px;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .toolbar {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .toolbar select,
+    .toolbar input {
+      height: 34px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: white;
+      padding: 0 10px;
+    }
+
+    .deal-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .deal {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-left: 5px solid var(--blue);
+      border-radius: 8px;
+      padding: 14px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 12px;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+    }
+
+    .deal.active {
+      outline: 2px solid #202428;
+    }
+
+    .deal.hot { border-left-color: var(--green); }
+    .deal.watch { border-left-color: var(--amber); }
+    .deal.risk { border-left-color: var(--red); }
+
+    .deal h2 {
+      margin: 0;
+      font-size: 16px;
+      line-height: 1.25;
+    }
+
+    .deal .meta {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 12px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .badges {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .badge {
+      border-radius: 999px;
+      padding: 4px 8px;
+      font-size: 11px;
+      color: var(--muted);
+      background: var(--soft);
+      white-space: nowrap;
+    }
+
+    .badge.green { color: var(--green); background: var(--green-soft); }
+    .badge.amber { color: var(--amber); background: var(--amber-soft); }
+    .badge.red { color: var(--red); background: var(--red-soft); }
+    .badge.blue { color: var(--blue); background: var(--blue-soft); }
+    .badge.purple { color: var(--purple); background: var(--purple-soft); }
+
+    .score {
+      width: 58px;
+      height: 58px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      background: #202428;
+      color: white;
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .detail {
+      position: sticky;
+      top: 94px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .detail-top {
+      padding: 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .detail-top h2 {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.25;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      border-bottom: 1px solid var(--line);
+    }
+
+    .detail-stat {
+      padding: 12px 14px;
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      min-height: 68px;
+    }
+
+    .detail-stat:nth-child(even) {
+      border-right: 0;
+    }
+
+    .detail-stat span {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .detail-stat strong {
+      display: block;
+      margin-top: 5px;
+      font-size: 15px;
+    }
+
+    .section {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .section:last-child {
+      border-bottom: 0;
+    }
+
+    .section h3 {
+      margin: 0 0 8px;
+      font-size: 13px;
+    }
+
+    .section p,
+    .section li {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .section p {
+      margin: 0;
+    }
+
+    .section ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    .source-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .source {
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      min-height: 132px;
+      box-shadow: var(--shadow);
+    }
+
+    .source h2 {
+      margin: 0;
+      font-size: 15px;
+    }
+
+    .source p {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.4;
+      margin: 8px 0 0;
+    }
+
+    .source strong {
+      display: block;
+      margin-top: 12px;
+      font-size: 22px;
+    }
+
+    .intake {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 16px;
+      box-shadow: var(--shadow);
+      display: grid;
+      gap: 12px;
+      max-width: 860px;
+    }
+
+    .connector-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      max-width: 860px;
+    }
+
+    .connector {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      box-shadow: var(--shadow);
+      display: grid;
+      gap: 10px;
+      min-height: 148px;
+    }
+
+    .connector-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: start;
+    }
+
+    .connector h2 {
+      margin: 0;
+      font-size: 15px;
+    }
+
+    .connector p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .connector small {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    input, select, textarea {
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      min-height: 38px;
+      padding: 8px 10px;
+      color: var(--ink);
+      background: white;
+    }
+
+    textarea {
+      min-height: 96px;
+      resize: vertical;
+    }
+
+    .hidden { display: none; }
+
+    @media (max-width: 1040px) {
+      .shell { grid-template-columns: 1fr; }
+      .sidebar {
+        position: static;
+        flex-direction: row;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      .nav {
+        grid-template-columns: repeat(4, auto);
+      }
+      .market-note { display: none; }
+      .workspace { grid-template-columns: 1fr; }
+      .detail { position: static; }
+    }
+
+    @media (max-width: 720px) {
+      header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+      .header-actions,
+      .search {
+        width: 100%;
+      }
+      .metrics,
+      .source-grid,
+      .connector-grid,
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+      .content { padding: 16px; }
+      .deal { grid-template-columns: 1fr; }
+      .score {
+        width: 100%;
+        height: 42px;
+      }
+      .nav {
+        width: 100%;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="mark">DD</div>
+        <div>
+          <strong>Deal Desk</strong>
+          <span>PV / Arcadia / Scottsdale</span>
+        </div>
+      </div>
+      <nav class="nav" aria-label="Primary">
+        <button class="active" data-view="shortlist" title="Shortlist">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          Shortlist
+        </button>
+        <button data-view="sources" title="Sources">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M19.1 4.9l-2.8 2.8M7.7 16.3l-2.8 2.8"/></svg>
+          Sources
+        </button>
+        <button data-view="intake" title="Intake">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+          Auto Intake
+        </button>
+        <button data-view="metrics" title="Metrics">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 16l4-4 3 3 5-7"/></svg>
+          Metrics
+        </button>
+      </nav>
+      <div class="market-note">
+        Demo data only. Built to test whether a PV / Arcadia deal desk can cut through bad leads.
+      </div>
+    </aside>
+
+    <main class="main">
+      <header>
+        <div>
+          <h1 id="viewTitle">Today&apos;s Deal Shortlist</h1>
+          <div class="subhead" id="viewSubhead">Ranked by source quality, distress signal, spread, and next-action clarity.</div>
+        </div>
+        <div class="header-actions">
+          <input class="search" id="search" placeholder="Search address, source, signal">
+          <button class="button" id="toggleHot">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 3L2 10l9 3 3 9 8-19z"/></svg>
+            Hot only
+          </button>
+          <button class="button primary" data-view-jump="intake">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+            Add lead
+          </button>
+        </div>
+      </header>
+
+      <section class="content" id="shortlistView">
+        <div class="metrics">
+          <div class="metric"><span>New leads</span><strong>31</strong><small>Last 7 days</small></div>
+          <div class="metric"><span>Qualified cards</span><strong>9</strong><small>Worth a closer look</small></div>
+          <div class="metric"><span>Offers queued</span><strong>3</strong><small>Needs owner/agent contact</small></div>
+          <div class="metric"><span>Bad leads skipped</span><strong>46</strong><small>Estimated this week</small></div>
+        </div>
+        <div class="workspace">
+          <section>
+            <div class="toolbar">
+              <select id="sourceFilter" aria-label="Source filter">
+                <option value="all">All sources</option>
+                <option value="Agent">Agent</option>
+                <option value="Public Signal">Public signal</option>
+                <option value="Referral">Referral</option>
+                <option value="Wholesaler">Wholesaler</option>
+              </select>
+              <select id="stageFilter" aria-label="Stage filter">
+                <option value="all">All stages</option>
+                <option value="Call today">Call today</option>
+                <option value="Review comps">Review comps</option>
+                <option value="Watch">Watch</option>
+                <option value="Pass risk">Pass risk</option>
+              </select>
+              <input id="minScore" type="number" min="0" max="100" value="0" aria-label="Minimum score">
+            </div>
+            <div class="deal-list" id="dealList"></div>
+          </section>
+          <aside class="detail" id="detail"></aside>
+        </div>
+      </section>
+
+      <section class="content hidden" id="sourcesView">
+        <div class="source-grid">
+          <div class="source"><h2>PV / Arcadia Agent Tips</h2><p>Stale listings, price drops, ugly houses, inspection fallout, seller motivation.</p><strong>12</strong></div>
+          <div class="source"><h2>Local Referrals</h2><p>Contractors, cleaners, property managers, estate-sale operators, neighbors.</p><strong>8</strong></div>
+          <div class="source"><h2>Public Signals</h2><p>Tax, recorder, permit, code, estate, ownership, and property-condition signals.</p><strong>7</strong></div>
+          <div class="source"><h2>Wholesalers</h2><p>Inbound deals scored against actual buy box and recent comp reality.</p><strong>4</strong></div>
+          <div class="source"><h2>Watchlist</h2><p>Not a deal today, but worth tracking for price movement or motivation.</p><strong>18</strong></div>
+          <div class="source"><h2>Dead Leads</h2><p>Rejected with reason codes so the same bad deals do not waste time twice.</p><strong>26</strong></div>
+        </div>
+      </section>
+
+      <section class="content hidden" id="intakeView">
+        <div class="connector-grid">
+          <div class="connector">
+            <div class="connector-head">
+              <h2>Agent Email / MLS Export</h2>
+              <span class="badge green">Connected</span>
+            </div>
+            <p>Parses forwarded hot sheets, agent notes, stale listings, price drops, and CSV exports into draft deal cards.</p>
+            <small>Last run: 18 minutes ago</small>
+          </div>
+          <div class="connector">
+            <div class="connector-head">
+              <h2>Wholesaler Inbox</h2>
+              <span class="badge green">Connected</span>
+            </div>
+            <p>Extracts address, ask, photos, claimed ARV, assignment notes, and flags thin-spread blasts.</p>
+            <small>Last run: 42 minutes ago</small>
+          </div>
+          <div class="connector">
+            <div class="connector-head">
+              <h2>Public Signal Watch</h2>
+              <span class="badge amber">Pilot</span>
+            </div>
+            <p>Checks permitted sources for ownership, tax, permit, recorder, code, and watchlist changes where access is practical.</p>
+            <small>Needs source validation</small>
+          </div>
+          <div class="connector">
+            <div class="connector-head">
+              <h2>Referral SMS / Form</h2>
+              <span class="badge blue">Ready</span>
+            </div>
+            <p>Lets agents and trusted locals send an address or photo; the desk enriches it before the flipper sees it.</p>
+            <small>Manual typing by flipper: avoided</small>
+          </div>
+        </div>
+        <form class="intake" id="intakeForm">
+          <h2 style="margin:0;font-size:16px;">Fallback Entry</h2>
+          <div class="form-grid">
+            <label>Address<input required placeholder="Example: 7420 E Demo Rd"></label>
+            <label>Source<select><option>Agent</option><option>Referral</option><option>Public Signal</option><option>Wholesaler</option></select></label>
+            <label>Asking / expected price<input placeholder="$525,000"></label>
+            <label>Estimated ARV<input placeholder="$720,000"></label>
+            <label>Repair level<select><option>Light</option><option>Medium</option><option>Heavy</option><option>Unknown</option></select></label>
+            <label>Timeline<select><option>Immediate</option><option>30 days</option><option>60+ days</option><option>Unknown</option></select></label>
+          </div>
+          <label>Signal<textarea placeholder="Price drop, owner out of state, inherited property, bad roof, agent says seller is tired..."></textarea></label>
+          <button class="button primary" type="submit">Create demo card</button>
+        </form>
+      </section>
+
+      <section class="content hidden" id="metricsView">
+        <div class="metrics">
+          <div class="metric"><span>Lead to qualified</span><strong>29%</strong><small>Target: 20%+</small></div>
+          <div class="metric"><span>Qualified to offer</span><strong>33%</strong><small>3 of 9 this week</small></div>
+          <div class="metric"><span>Best source</span><strong>Agent</strong><small>Highest score average</small></div>
+          <div class="metric"><span>Bad lead reason</span><strong>Thin spread</strong><small>Most common reject</small></div>
+        </div>
+        <div class="source-grid">
+          <div class="source"><h2>Agent</h2><p>Best source quality, but needs a simple submission workflow and fast feedback.</p><strong>82 avg</strong></div>
+          <div class="source"><h2>Referral</h2><p>Lower volume, highest chance of being early before public competition.</p><strong>76 avg</strong></div>
+          <div class="source"><h2>Public Signal</h2><p>Good for watchlists and enrichment, weak as a standalone deal source.</p><strong>61 avg</strong></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const deals = [
+      {
+        id: 1,
+        status: "hot",
+        score: 88,
+        address: "Demo Property A, Arcadia Lite",
+        source: "Agent",
+        stage: "Call today",
+        price: "$515k",
+        arv: "$710k",
+        repairs: "$75k-$105k",
+        mao: "$475k-$495k",
+        signal: "91 DOM, second price drop, outdated interior, listing agent mentioned seller wants certainty.",
+        next: "Agent calls listing agent today and asks about inspection issues, timeline, and seller flexibility.",
+        risks: ["Spread depends on true repair load", "Need roof/HVAC age", "Could be shopped to other investor buyers"],
+        badges: ["Stale MLS", "Price drop", "Agent signal"]
+      },
+      {
+        id: 2,
+        status: "hot",
+        score: 84,
+        address: "Demo Property B, Paradise Valley",
+        source: "Referral",
+        stage: "Review comps",
+        price: "Unknown",
+        arv: "$640k",
+        repairs: "$90k-$130k",
+        mao: "$405k-$435k",
+        signal: "Contractor saw deferred maintenance during bid visit. Owner asked about selling as-is.",
+        next: "Confirm owner permission, collect photos, estimate repair band, then make soft as-is range.",
+        risks: ["Unclear seller intent", "May need licensed agent involvement", "No asking price yet"],
+        badges: ["Contractor tip", "As-is", "Early signal"]
+      },
+      {
+        id: 3,
+        status: "watch",
+        score: 72,
+        address: "Demo Property C, Arcadia Proper",
+        source: "Public Signal",
+        stage: "Watch",
+        price: "$455k",
+        arv: "$590k",
+        repairs: "$45k-$70k",
+        mao: "$410k-$425k",
+        signal: "Out-of-state owner, dated last permit history, nearby remodeled comps moving.",
+        next: "Add to watchlist and alert on price drop, ownership change, or listing status change.",
+        risks: ["No motivation confirmed", "Spread not strong enough yet"],
+        badges: ["Absentee owner", "Permit gap", "Watchlist"]
+      },
+      {
+        id: 4,
+        status: "risk",
+        score: 58,
+        address: "Demo Property D, Scottsdale",
+        source: "Wholesaler",
+        stage: "Pass risk",
+        price: "$390k",
+        arv: "$510k",
+        repairs: "$80k-$115k",
+        mao: "$300k-$330k",
+        signal: "Wholesaler claims deep discount, but comps are thin and assignment spread appears high.",
+        next: "Pass unless seller access and price transparency improve.",
+        risks: ["Thin spread", "Unverified repair scope", "Likely blasted to buyers list"],
+        badges: ["Wholesaler", "Thin spread", "Pass"]
+      },
+      {
+        id: 5,
+        status: "watch",
+        score: 69,
+        address: "Demo Property E, Paradise Valley Border",
+        source: "Agent",
+        stage: "Review comps",
+        price: "$675k",
+        arv: "$850k",
+        repairs: "$100k-$150k",
+        mao: "$560k-$590k",
+        signal: "Strong location, poor photos, functional obsolescence, seller rejected two retail offers.",
+        next: "Review layout constraints and ask if seller would consider clean cash close below list.",
+        risks: ["Premium area may compress margin", "Unknown structural constraints"],
+        badges: ["Poor photos", "Rejected offers", "Agent signal"]
+      }
+    ];
+
+    let selectedId = 1;
+    let hotOnly = false;
+
+    const list = document.getElementById("dealList");
+    const detail = document.getElementById("detail");
+    const sourceFilter = document.getElementById("sourceFilter");
+    const stageFilter = document.getElementById("stageFilter");
+    const minScore = document.getElementById("minScore");
+    const search = document.getElementById("search");
+    const toggleHot = document.getElementById("toggleHot");
+
+    function badgeClass(text) {
+      const lower = text.toLowerCase();
+      if (lower.includes("pass") || lower.includes("thin")) return "red";
+      if (lower.includes("price") || lower.includes("watch")) return "amber";
+      if (lower.includes("agent") || lower.includes("early")) return "green";
+      if (lower.includes("contractor") || lower.includes("poor")) return "purple";
+      return "blue";
+    }
+
+    function filteredDeals() {
+      const q = search.value.trim().toLowerCase();
+      return deals.filter((deal) => {
+        const sourceOk = sourceFilter.value === "all" || deal.source === sourceFilter.value;
+        const stageOk = stageFilter.value === "all" || deal.stage === stageFilter.value;
+        const scoreOk = deal.score >= Number(minScore.value || 0);
+        const hotOk = !hotOnly || deal.status === "hot";
+        const qOk = !q || [deal.address, deal.source, deal.stage, deal.signal, deal.badges.join(" ")].join(" ").toLowerCase().includes(q);
+        return sourceOk && stageOk && scoreOk && hotOk && qOk;
+      });
+    }
+
+    function renderList() {
+      const rows = filteredDeals();
+      if (!rows.some((deal) => deal.id === selectedId) && rows.length) selectedId = rows[0].id;
+      list.innerHTML = rows.map((deal) => `
+        <article class="deal ${deal.status} ${deal.id === selectedId ? "active" : ""}" data-id="${deal.id}">
+          <div>
+            <h2>${deal.address}</h2>
+            <div class="meta">
+              <span>${deal.source}</span>
+              <span>${deal.stage}</span>
+              <span>ARV ${deal.arv}</span>
+              <span>MAO ${deal.mao}</span>
+            </div>
+            <div class="badges">
+              ${deal.badges.map((badge) => `<span class="badge ${badgeClass(badge)}">${badge}</span>`).join("")}
+            </div>
+          </div>
+          <div class="score">${deal.score}</div>
+        </article>
+      `).join("") || `<div class="source"><h2>No matching deals</h2><p>Adjust filters or add a new lead.</p></div>`;
+      document.querySelectorAll(".deal").forEach((node) => {
+        node.addEventListener("click", () => {
+          selectedId = Number(node.dataset.id);
+          renderList();
+          renderDetail();
+        });
+      });
+      renderDetail();
+    }
+
+    function renderDetail() {
+      const deal = deals.find((item) => item.id === selectedId) || filteredDeals()[0];
+      if (!deal) {
+        detail.innerHTML = "";
+        return;
+      }
+      detail.innerHTML = `
+        <div class="detail-top">
+          <h2>${deal.address}</h2>
+          <div class="badges">${deal.badges.map((badge) => `<span class="badge ${badgeClass(badge)}">${badge}</span>`).join("")}</div>
+        </div>
+        <div class="detail-grid">
+          <div class="detail-stat"><span>Score</span><strong>${deal.score}/100</strong></div>
+          <div class="detail-stat"><span>Source</span><strong>${deal.source}</strong></div>
+          <div class="detail-stat"><span>Price</span><strong>${deal.price}</strong></div>
+          <div class="detail-stat"><span>ARV</span><strong>${deal.arv}</strong></div>
+          <div class="detail-stat"><span>Repairs</span><strong>${deal.repairs}</strong></div>
+          <div class="detail-stat"><span>Max offer</span><strong>${deal.mao}</strong></div>
+        </div>
+        <div class="section"><h3>Signal</h3><p>${deal.signal}</p></div>
+        <div class="section"><h3>Next action</h3><p>${deal.next}</p></div>
+        <div class="section"><h3>Risk checks</h3><ul>${deal.risks.map((risk) => `<li>${risk}</li>`).join("")}</ul></div>
+      `;
+    }
+
+    function switchView(view) {
+      const views = ["shortlist", "sources", "intake", "metrics"];
+      views.forEach((name) => {
+        document.getElementById(`${name}View`).classList.toggle("hidden", name !== view);
+      });
+      document.querySelectorAll("[data-view]").forEach((button) => {
+        button.classList.toggle("active", button.dataset.view === view);
+      });
+      const titles = {
+        shortlist: ["Today's Deal Shortlist", "Ranked by source quality, distress signal, spread, and next-action clarity."],
+        sources: ["Source Mix", "Track where qualified opportunities originate and where time gets wasted."],
+        intake: ["Auto Intake", "Connected sources create deal cards; manual entry is only a fallback."],
+        metrics: ["Pipeline Metrics", "Measure whether the desk saves time and produces offers."]
+      };
+      document.getElementById("viewTitle").textContent = titles[view][0];
+      document.getElementById("viewSubhead").textContent = titles[view][1];
+    }
+
+    [sourceFilter, stageFilter, minScore, search].forEach((input) => input.addEventListener("input", renderList));
+    toggleHot.addEventListener("click", () => {
+      hotOnly = !hotOnly;
+      toggleHot.classList.toggle("primary", hotOnly);
+      renderList();
+    });
+    document.querySelectorAll("[data-view], [data-view-jump]").forEach((button) => {
+      button.addEventListener("click", () => switchView(button.dataset.view || button.dataset.viewJump));
+    });
+    document.getElementById("intakeForm").addEventListener("submit", (event) => {
+      event.preventDefault();
+      switchView("shortlist");
+    });
+
+    renderList();
+  </script>
+</body>
+</html>

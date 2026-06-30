@@ -805,14 +805,14 @@
         <form class="intake" id="intakeForm">
           <h2 style="margin:0;font-size:16px;">Fallback Entry</h2>
           <div class="form-grid">
-            <label>Address<input required placeholder="Example: 7420 E Demo Rd"></label>
-            <label>Source<select><option>Agent</option><option>Referral</option><option>Public Signal</option><option>Wholesaler</option></select></label>
-            <label>Asking / expected price<input placeholder="$525,000"></label>
-            <label>Estimated ARV<input placeholder="$720,000"></label>
-            <label>Repair level<select><option>Light</option><option>Medium</option><option>Heavy</option><option>Unknown</option></select></label>
-            <label>Timeline<select><option>Immediate</option><option>30 days</option><option>60+ days</option><option>Unknown</option></select></label>
+            <label>Address<input name="address" required placeholder="Example: 7420 E Demo Rd"></label>
+            <label>Source<select name="source"><option>Agent</option><option>Referral</option><option>Public Signal</option><option>Wholesaler</option></select></label>
+            <label>Asking / expected price<input name="price" placeholder="$525,000"></label>
+            <label>Estimated ARV<input name="arv" placeholder="$720,000"></label>
+            <label>Repair level<select name="repair"><option>Light</option><option>Medium</option><option>Heavy</option><option>Unknown</option></select></label>
+            <label>Timeline<select name="timeline"><option>Immediate</option><option>30 days</option><option>60+ days</option><option>Unknown</option></select></label>
           </div>
-          <label>Signal<textarea placeholder="Price drop, owner out of state, inherited property, bad roof, agent says seller is tired..."></textarea></label>
+          <label>Signal<textarea name="signal" placeholder="Price drop, owner out of state, inherited property, bad roof, agent says seller is tired..."></textarea></label>
           <button class="button primary" type="submit">Create demo card</button>
         </form>
       </section>
@@ -1074,7 +1074,43 @@
     });
     document.getElementById("intakeForm").addEventListener("submit", (event) => {
       event.preventDefault();
+      const data = new FormData(event.currentTarget);
+      const repair = String(data.get("repair") || "Unknown");
+      const source = String(data.get("source") || "Referral");
+      const isWholesaleLean = repair === "Heavy" || source === "Wholesaler";
+      const flipScore = isWholesaleLean ? 62 : repair === "Unknown" ? 66 : 78;
+      const wholesaleScore = isWholesaleLean ? 78 : source === "Referral" ? 74 : 67;
+      const routeKey = wholesaleScore > flipScore + 5 ? "wholesale" : "flip";
+      const route = routeKey === "wholesale" ? "Wholesale" : "Flip";
+      const newDeal = {
+        id: Date.now(),
+        status: routeKey === "wholesale" ? "hot" : "watch",
+        score: Math.max(flipScore, wholesaleScore),
+        flipScore,
+        wholesaleScore,
+        route,
+        routeKey,
+        address: String(data.get("address") || "New demo property"),
+        source,
+        stage: "Review comps",
+        price: String(data.get("price") || "Unknown"),
+        arv: String(data.get("arv") || "Needs comps"),
+        repairs: repair,
+        mao: "Needs comp set",
+        signal: String(data.get("signal") || "Manually added pilot lead. Needs enrichment and comp review."),
+        next: "Pull comps, enrich property record, then confirm whether this routes to flip, wholesale, watch, or pass.",
+        risks: ["Fallback entry needs enrichment", "Scores are provisional until comps are attached", "Verify source and seller motivation"],
+        badges: [`${route} route`, "Fallback entry", "Needs comps"]
+      };
+      deals.unshift(newDeal);
+      selectedId = newDeal.id;
+      routeFilter = "all";
+      document.querySelectorAll("[data-route-filter]").forEach((node) => {
+        node.classList.toggle("active", node.dataset.routeFilter === "all");
+      });
+      event.currentTarget.reset();
       switchView("shortlist");
+      renderList();
     });
 
     renderList();

@@ -659,6 +659,10 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
           Shortlist
         </button>
+        <button data-view="market" title="Market Scan">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3V6z"/><path d="M9 3v15M15 6v15"/></svg>
+          Market Scan
+        </button>
         <button data-view="sources" title="Sources">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M19.1 4.9l-2.8 2.8M7.7 16.3l-2.8 2.8"/></svg>
           Sources
@@ -743,6 +747,23 @@
           <div class="source"><h2>Wholesalers</h2><p>Inbound deals scored against actual buy box and recent comp reality.</p><strong>4</strong></div>
           <div class="source"><h2>Watchlist</h2><p>Not a deal today, but worth tracking for price movement or motivation.</p><strong>18</strong></div>
           <div class="source"><h2>Dead Leads</h2><p>Rejected with reason codes so the same bad deals do not waste time twice.</p><strong>26</strong></div>
+        </div>
+      </section>
+
+      <section class="content hidden" id="marketView">
+        <div class="metrics">
+          <div class="metric"><span>Properties indexed</span><strong>142k</strong><small>Phoenix metro pilot area</small></div>
+          <div class="metric"><span>Comp sets built</span><strong>8.4k</strong><small>Recent sold matches</small></div>
+          <div class="metric"><span>Market alerts</span><strong>27</strong><small>Price, status, signal changes</small></div>
+          <div class="metric"><span>Promoted to cards</span><strong>9</strong><small>High-score opportunities</small></div>
+        </div>
+        <div class="source-grid">
+          <div class="source"><h2>Property Universe</h2><p>Parcel/property records from a licensed data provider, filtered to the Phoenix metro buy box.</p><strong>Nightly</strong></div>
+          <div class="source"><h2>Comps Engine</h2><p>Matches sold/listed properties by distance, size, beds/baths, year, condition, and recency.</p><strong>ARV score</strong></div>
+          <div class="source"><h2>Listing Watch</h2><p>Agent-approved MLS alerts, saved-search emails, and listing/feed updates where permitted.</p><strong>ASAP</strong></div>
+          <div class="source"><h2>Signal Watch</h2><p>Ownership, tax, permit, recorder, price-drop, stale-listing, and referral signals.</p><strong>27 new</strong></div>
+          <div class="source"><h2>Opportunity Routing</h2><p>Promotes properties into flip, wholesale, watch, or pass based on score and confidence.</p><strong>4 routes</strong></div>
+          <div class="source"><h2>Data Guardrail</h2><p>No Zillow scraping dependency; use licensed APIs, agent feeds, and user-owned alerts.</p><strong>Compliant</strong></div>
         </div>
       </section>
 
@@ -1015,7 +1036,7 @@
     }
 
     function switchView(view) {
-      const views = ["shortlist", "sources", "intake", "metrics"];
+      const views = ["shortlist", "market", "sources", "intake", "metrics"];
       views.forEach((name) => {
         document.getElementById(`${name}View`).classList.toggle("hidden", name !== view);
       });
@@ -1024,6 +1045,7 @@
       });
       const titles = {
         shortlist: ["Today's Deal Shortlist", "Ranked by source quality, distress signal, spread, and next-action clarity."],
+        market: ["Market Scan", "Index the target market, build comps, and promote high-signal properties."],
         sources: ["Source Mix", "Track where qualified opportunities originate and where time gets wasted."],
         intake: ["Auto Intake", "Connected sources create deal cards; manual entry is only a fallback."],
         metrics: ["Pipeline Metrics", "Measure whether the desk saves time and produces offers."]
